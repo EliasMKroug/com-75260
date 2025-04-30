@@ -12,9 +12,10 @@ import realTimeProducts, { setupSocket } from './routes/realTimeProducts.route.j
 // Rutas
 import { connectToMongo } from './connections/db.conections.js';
 import productsRouter from './routes/products.route.js';
-import productsCarts from './routes/carts.route.js';
+import cartsRouter from './routes/carts.route.js';
 import producsApiRoutes from './routes/api/products.routes.api.js';
 import cartApiRoutes from './routes/api/carts.api.routes.js';
+import usersRouter from './routes/users.route.js';
 
 // Variables globales
 const app = express();
@@ -52,7 +53,8 @@ connectToMongo();
 
 // Rutas FS
 app.use('/products', productsRouter);
-app.use('/carts', productsCarts);
+app.use('/carts', cartsRouter);
+app.use('/users', usersRouter);
 
 // Rutas de Socket.IO
 app.use('/realtimeproducts', realTimeProducts);
@@ -72,5 +74,5 @@ httpServer.listen(PORT, (error) => {
     if (error) {
         console.log(error);
     }
-    console.log(`Server escuchando en el puerto ${PORT}`);
+    console.log(`Escuchando en http://127.0.0.1:${PORT}`);
 });

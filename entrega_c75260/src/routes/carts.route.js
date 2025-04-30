@@ -12,7 +12,6 @@ router.get('/:uid', async (req, res) => {
         const allProducts = await cartsManager.getCartsById(uid)
         // Calcular la sumatoria total de productos
         const totalQuantity = allProducts.reduce((acc, item) => acc + item.quantity, 0);
-        console.log({ allProducts, totalQuantity })
         res.render('cartProduct', { allProducts, totalQuantity })
     } catch (error) {
         res.status(404).json({ message: 'Error al encontrar los productos' })
@@ -31,7 +30,6 @@ router.post('/:uid/products/:pid', async (req, res) => {
             res.redirect(`/carts/${uid}`)
         } else {
             const allProducts = await cartsManager.addProduct(uid, pid)
-            console.log('Se agrego producto exitosamente', { allProducts }) 
             res.redirect(`/carts/${uid}`)
         }
 
