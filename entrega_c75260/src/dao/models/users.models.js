@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose'
+import mongoosepaginatev2 from 'mongoose-paginate-v2'
 
 const usersCollection= 'users'
 
@@ -22,6 +23,8 @@ const usersSchema = new Schema({
         default: 'user'
     }
 })
+
+usersSchema.plugin(mongoosepaginatev2)
 
 export const usersModel = model(usersCollection, usersSchema)
 

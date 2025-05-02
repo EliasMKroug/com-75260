@@ -7,7 +7,7 @@ const usersManager = new usersMongo();
 // Endpoint para obtener todos los usuarios
 router.get('/', async (req, res) => {
     try {
-        const users = await usersManager.getUser({});
+        const users = await usersManager.getUsers(req.query);
         res.status(200).json({ message: 'Usuarios encontrados', payload: users });
     } catch (error) {
         res.status(500).json({ message: 'Error al obtener los usuarios', payload: error });
@@ -16,22 +16,10 @@ router.get('/', async (req, res) => {
 
 // Endpoint para registrar un nuevo usuario
 router.post('/', async (req, res) => {
-    try {
-        const { first_name, last_name, email, age, password, role } = req.body;
-        const newUser = {
-            first_name,
-            last_name,
-            email,
-            age,
-            password,
-            role
-        };
-        const userCreated = await usersManager.createUser(newUser);
-        res.status(201).json({ message: 'Usuario creado', payload: userCreated });
-    } catch (error) {
-        res.status(500).json({ message: 'Error al crear el usuario', payload: error });
-    }
-});
+    const userCreated = await usersManager.createUsers(req.body);
+    res.status(201).json({ message: 'Usuario creado', payload: userCreated });    
+})
+
 
 export default router;
 

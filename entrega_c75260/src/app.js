@@ -74,5 +74,5 @@ httpServer.listen(PORT, (error) => {
     if (error) {
         console.log(error);
     }
-    console.log(`Escuchando en http://127.0.0.1:${PORT}`);
+    console.log(`Escuchando en http://localhost:${PORT}`);
 });
