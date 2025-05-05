@@ -30,15 +30,7 @@ class usersMongo {
 
     createUsers = async (user) => {
         try {
-            // const { first_name, last_name, email, age, password, role } = user
-            // const newUser = {
-            //     first_name,
-            //     last_name,
-            //     email,
-            //     age,
-            //     password,
-            //     role
-            // }
+
             const userCreated = await this.model.create( user)
             return userCreated
         } catch (error) {
