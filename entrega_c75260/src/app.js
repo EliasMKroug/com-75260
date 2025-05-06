@@ -1,78 +1,86 @@
-import express from 'express';
-import path from 'path';
-import { Server as ServerIO } from 'socket.io';
-import { Server as ServerHttp } from 'http';
-import { __dirname } from './utils.js';
-import { engine } from 'express-handlebars';
+import express from 'express'
+import path from 'path'
+import passport from 'passport'
+import { Server as ServerIO } from 'socket.io'
+import { Server as ServerHttp } from 'http'
+import { __dirname } from './utils.js'
+import { engine } from 'express-handlebars'
 
-
-//  Rutas de Socket.IO  
-import realTimeProducts, { setupSocket } from './routes/realTimeProducts.route.js';
+//  Rutas de Socket.IO
+import realTimeProducts, { setupSocket } from './routes/realTimeProducts.route.js'
 
 // Rutas
-import { connectToMongo } from './connections/db.conections.js';
-import productsRouter from './routes/products.route.js';
-import cartsRouter from './routes/carts.route.js';
-import producsApiRoutes from './routes/api/products.routes.api.js';
-import cartApiRoutes from './routes/api/carts.api.routes.js';
-import usersRouter from './routes/users.route.js';
+import { connectToMongo } from './connections/db.conections.js'
+import viewsRouter from './routes/views.route.js'
+import productsRouter from './routes/products.route.js'
+import cartsRouter from './routes/carts.route.js'
+import producsApiRoutes from './routes/api/products.routes.api.js'
+import cartApiRoutes from './routes/api/carts.api.routes.js'
+import usersRouter from './routes/users.route.js'
+import sessionsRouter from './routes/api/sessions.api.router.js'
+import { initializePassport } from './config/passport.config.js'
 
 // Variables globales
-const app = express();
-const PORT = process.env.PORT || 8080;
-const httpServer = new ServerHttp(app);
-const socketServer = new ServerIO(httpServer);
+const app = express()
+const PORT = process.env.PORT || 8080
+const httpServer = new ServerHttp(app)
+const socketServer = new ServerIO(httpServer)
 
 // Configuración de Handlebars con el helper JSON
 app.engine('handlebars', engine({
-    partialsDir: path.join(__dirname, 'views', 'partials'),
-    helpers: {
-        json: function (context) {
-            return JSON.stringify(context, null, 2);
-        }
-    },
-    runtimeOptions: {
-        allowProtoPropertiesByDefault: true,
-        allowProtoMethodsByDefault: true,
+  partialsDir: path.join(__dirname, 'views', 'partials'),
+  helpers: {
+    json: function (context) {
+      return JSON.stringify(context, null, 2)
     }
-}));
+  },
+  runtimeOptions: {
+    allowProtoPropertiesByDefault: true,
+    allowProtoMethodsByDefault: true
+  }
+}))
 
-app.set('views', __dirname + '/views');
-app.set('view engine', 'handlebars');
+app.set('views', __dirname + '/views')
+app.set('view engine', 'handlebars')
 
 // Middleware para lectura de JSON y archivos estáticos
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(__dirname + '/public'));
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+app.use(express.static(__dirname + '/public'))
+
+initializePassport()
+app.use(passport.initialize())
 
 // Conexión a Socket.IO
-setupSocket(socketServer);
+setupSocket(socketServer)
 
 // Conexión a MongoDB
-connectToMongo();
+connectToMongo()
 
 // Rutas FS
-app.use('/products', productsRouter);
-app.use('/carts', cartsRouter);
-app.use('/users', usersRouter);
+app.use('/', viewsRouter)
+app.use('/products', productsRouter)
+app.use('/carts', cartsRouter)
+app.use('/users', usersRouter)
 
 // Rutas de Socket.IO
-app.use('/realtimeproducts', realTimeProducts);
+app.use('/realtimeproducts', realTimeProducts)
 
 // Rutas de la API
-app.use('/api/products', producsApiRoutes);
-app.use('/api/carts', cartApiRoutes);
+app.use('/api/products', producsApiRoutes)
+app.use('/api/carts', cartApiRoutes)
+app.use('/api/session', sessionsRouter)
 
 // Middleware para errores de servidor
 app.use((error, req, res, next) => {
-    console.error(error);
-    res.status(500).send('Error 500 en el servidor');
-});
+  console.error(error)
+  res.status(500).send('Error 500 en el servidor')
+})
 
 // Server escuchando en el puerto 8080
 httpServer.listen(PORT, (error) => {
-    if (error) {
-        console.log(error);
-    }
-    console.log(`Escuchando en http://localhost:${PORT}`);
-});
+  if (error) {
+    console.log(error)
+  }
+  console.log(`Escuchando en http://localhost:${PORT}`)
+})

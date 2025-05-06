@@ -21,11 +21,9 @@ cart: Id con referencia a Carts
 
 role: String (valor por defecto: 'user')
 
-==============================>>>>> OK
 
 Encriptación de Contraseña:
 Utilizar el paquete bcrypt para encriptar la contraseña del usuario mediante el método hashSync.
-
 
 Estrategias de Passport:
 Desarrollar las estrategias de Passport para que funcionen con el modelo de usuarios creado.
@@ -38,6 +36,7 @@ Implementar un sistema de login del usuario que trabaje con JWT (JSON Web Tokens
 Ruta de Validación:
 Agregar al router /api/sessions/ la ruta /current, que validará al usuario logueado y devolverá en una respuesta sus datos asociados al JWT.
 
+==============================>>>>> OK
 
 Formato de Entrega:
 
