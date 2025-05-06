@@ -1,6 +1,7 @@
 import { Router } from 'express'
-import productsMongo from '../dao/products.dao.js'
-import { uploader } from '../utils.js'
+// import { productsModel } from '../../model/products.model.js'
+import productsMongo from '../../dao/products.dao.js'
+import { uploader } from '../../utils.js'
 
 const router = Router()
 
@@ -8,20 +9,15 @@ const productManager = new productsMongo()
 
 // Enpoint productos con query params
 router.get('/', async (req, res) => {
-  const productAll = await productManager.getProducts(req.query)
-  res.render('home', { productAll })
+  const products = await productManager.getProducts(req.query)
+  res.send({ status: 'success', payload: products })
 })
 
 // Endpoint productos por id
 router.get('/:uid', async (req, res) => {
-  try {
-    const { uid } = req.params
-    const productDetails = await productManager.getProductById(uid)
-    res.render('proDetails', { productDetails })
-  } catch (error) {
-    console.error('Error al obtener producto:', error)
-    res.status(500).send('Error al cargar los productos')
-  }
+  const { uid } = req.params
+  const product = await productManager.getProductById(uid)
+  res.send({ status: 'success', payload: product })
 })
 
 // Endpoint creacion de producto
