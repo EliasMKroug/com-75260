@@ -18,7 +18,6 @@ router.get('/:uid', async (req, res) => {
         const { uid } = req.params
         const productDetails = await productManager.getProductById(uid)
         res.render('proDetails', { productDetails })
-        //res.send({status: 'success', payload:product})
     } catch (error) {
         console.error("Error al obtener producto:", error);
         res.status(500).send("Error al cargar los productos");

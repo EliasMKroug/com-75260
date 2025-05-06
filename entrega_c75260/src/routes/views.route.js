@@ -1,13 +1,13 @@
-import { Router } from "express";
-import productsMongo from '../dao/products.dao.js'
+import { Router } from 'express'
 
 const router = Router()
 
-//ManagerViews
-const viewManagerMongo = new productsMongo()
+router.get('/login', (req, res) => {
+  res.render('login')
+})
 
-//ruta con datos que va a generar el home.handlebars
-// router.get('/', async (req, res) => {})
-
+router.get('/register', (req, res) => {
+  res.render('register')
+})
 
 export default router
