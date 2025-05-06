@@ -9,15 +9,13 @@ const cookieExtractor = (req) => {
 
 export const initializePassport = () => {
   passport.use('jwt', new JwtStrategy({
-    // ✅ Permite usar header Authorization o cookie 'token'
     jwtFromRequest: ExtractJwt.fromExtractors([
-      ExtractJwt.fromAuthHeaderAsBearerToken(), // "Authorization: Bearer <token>"
-      cookieExtractor                             // "token" cookie
+      ExtractJwt.fromAuthHeaderAsBearerToken(),
+      cookieExtractor
     ]),
     secretOrKey: PRIVATE_KEY
   }, async (jwt_payload, done) => {
     try {
-      // Si querés, podrías buscar el usuario en DB aquí usando jwt_payload.id
       return done(null, jwt_payload)
     } catch (error) {
       return done(error, false)
