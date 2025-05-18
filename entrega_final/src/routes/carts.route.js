@@ -24,7 +24,6 @@ router.post('/:uid/products/:pid', async (req, res) => {
   const { uid, pid } = req.params
   const { quantity } = req.body
   try {
-    console.log(quantity)
     if (quantity > 1) {
       await cartsManager.updateProductToCart(uid, pid, quantity)
       res.redirect(`/carts/${uid}`)
