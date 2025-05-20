@@ -1,49 +1,34 @@
 import { Router } from 'express'
-// import { productsModel } from '../../model/products.model.js'
-import productsMongo from '../../dao/products.dao.js'
-import { uploader } from '../../utils.js'
+import { passportCall } from '../../middlewares/passportCall.middleware.js'
+import { checkRole } from '../../middlewares/checkRole.middleware.js'
+import { productController } from '../../controllers/product.controller.js'
 
 const router = Router()
 
-const productManager = new productsMongo()
+router.get('/', [passportCall('jwt', { session: false })], productController.getAll)
 
-// Enpoint productos con query params
-router.get('/', async (req, res) => {
-  const products = await productManager.getProducts(req.query)
-  res.send({ status: 'success', payload: products })
-})
+router.get(
+  '/:id',
+  [passportCall('jwt', { session: false })],
+  productController.getById
+)
 
-// Endpoint productos por id
-router.get('/:uid', async (req, res) => {
-  const { uid } = req.params
-  const product = await productManager.getProductById(uid)
-  res.send({ status: 'success', payload: product })
-})
+router.post(
+  '/',
+  [passportCall('jwt', { session: false }), checkRole(['admin'])],
+  productController.create
+)
 
-// Endpoint creacion de producto
-router.post('/', uploader.single('file'), async (req, res) => {
-  if (!req.file) return res.status(402).json({ message: 'Error en algun campo' })
+router.put(
+  '/:id',
+  [passportCall('jwt', { session: false }), checkRole(['admin'])],
+  productController.update
+)
 
-  const thumbnail = req.file.path.split('public')[1]
-  const prod = req.body
-  const newProduct = await productManager.addProduct(prod, thumbnail)
-
-  res.status(201).json({ status: 'success', payload: newProduct })
-})
-
-// Endpoint actualizar producto
-router.put('/:pid', uploader.single('file'), async (req, res) => {
-  const { pid } = req.params
-  const updateProduct = await productManager.updateProduct(req, pid)
-  res.status(201).json({ status: 'success', message: 'Product updated', payload: updateProduct })
-})
-
-// Endpint borrar productos
-router.delete('/:pid', async (req, res) => {
-  const { pid } = req.params
-  const productDel = await productManager.deleteProduct(pid)
-  const stat = productDel ? 200 : 400
-  res.status(stat).json({ message: 'Product deleted', payload: productDel })
-})
+router.delete(
+  '/:id',
+  [passportCall('jwt', { session: false }), checkRole(['admin'])],
+  productController.delete
+)
 
 export default router

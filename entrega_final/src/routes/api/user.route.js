@@ -1,7 +1,7 @@
 import { Router } from 'express'
-import { userController } from '../controllers/user.controller.js'
+import { userController } from '../../controllers/user.controller.js'
 import passport from 'passport'
-import { checkRole } from '../midlewere/checkRole.middleware.js'
+import { checkRole } from '../../middlewares/checkRole.middleware.js'
 
 const router = Router()
 
