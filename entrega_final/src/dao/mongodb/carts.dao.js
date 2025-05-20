@@ -2,10 +2,6 @@ import MongoDao from './mongo.dao.js'
 import { cartsModel } from '../models/carts.models.js'
 
 export default class CartDaoMongo extends MongoDao {
-  constructor (model) {
-    super(model)
-  }
-
   create = async () => {
     try {
       return await this.model.create({

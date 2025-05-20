@@ -14,14 +14,10 @@ import realTimeProducts, { setupSocket } from './routes/realTimeProducts.route.j
 
 // Rutas
 import { connectToMongo } from './connections/db.conections.js'
-import viewsRouter from './routes/views.route.js'
-import productsRouter from './routes/products.route.js'
-import cartsRouter from './routes/carts.route.js'
-import producsApiRoutes from './routes/api/products.routes.api.js'
-import cartApiRoutes from './routes/api/carts.api.routes.js'
-import usersRouter from './routes/user.route.js'
-import sessionApiRouters from './routes/api/session.api.js'
 import { initializePassport } from './config/passport/jwt-strategy.js'
+import { apiRouter } from './routes/api/index.js'
+import { productsRouter } from './routes/index.js'
+import { errorHandler } from './middlewares/error.middlewere.js'
 
 // Variables globales
 const app = express()
@@ -42,9 +38,11 @@ app.engine('handlebars', engine({
     allowProtoMethodsByDefault: true
   }
 }))
-
 app.set('views', __dirname + '/views')
 app.set('view engine', 'handlebars')
+
+// Middleware para manejo de cookies
+initializePassport()
 
 const sessionConfig = {
   store: MongoStore.create({
@@ -59,18 +57,23 @@ const sessionConfig = {
   }
 }
 
+app
 // Middleware para lectura de JSON y archivos estáticos
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
-app.use(express.static(__dirname + '/public'))
-app.use(cookieParser())
-
-// Middleware para manejo de cookies
-initializePassport()
-app.use(passport.initialize())
-
-app.use(session(sessionConfig))
-app.use(passport.session())
+  .use(express.json())
+  .use(express.urlencoded({ extended: true }))
+  .use(express.static(__dirname + '/public'))
+  .use(cookieParser())
+  .use(passport.initialize())
+  .use(session(sessionConfig))
+  .use(passport.session())
+// Middleware para errores de servidor
+  .use(errorHandler)
+// Rutas FS
+  .use('/', productsRouter.getRouter())
+// Rutas de Socket.IO
+  .use('/realtimeproducts', realTimeProducts)
+// Rutas de la API
+  .use('/api', apiRouter.getRouter())
 
 // Conexión a Socket.IO
 setupSocket(socketServer)
@@ -79,26 +82,6 @@ setupSocket(socketServer)
 connectToMongo()
   .then(() => console.log('Se conecto a la base de datos'))
   .catch((error) => console.log(error))
-
-// Rutas FS
-app.use('/', viewsRouter)
-app.use('/products', productsRouter)
-app.use('/carts', cartsRouter)
-app.use('/users', usersRouter)
-
-// Rutas de Socket.IO
-app.use('/realtimeproducts', realTimeProducts)
-
-// Rutas de la API
-app.use('/api/products', producsApiRoutes)
-app.use('/api/carts', cartApiRoutes)
-app.use('/api/sessions', sessionApiRouters)
-
-// Middleware para errores de servidor
-app.use((error, req, res, next) => {
-  console.error(error)
-  res.status(500).send('Error 500 en el servidor')
-})
 
 // Server escuchando en el puerto 8080
 httpServer.listen(PORT, (error) => {
